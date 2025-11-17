@@ -1,0 +1,15 @@
+package com.hotelsoffers.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class DistrictDto {
+    private Long id;
+    private String name;
+    private Long provinceId;
+    private Boolean isActive;
+}
