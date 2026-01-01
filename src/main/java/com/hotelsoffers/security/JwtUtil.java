@@ -1,5 +1,6 @@
 package com.hotelsoffers.security;
 
+import com.hotelsoffers.entity.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,10 @@ public class JwtUtil {
         return extractClaim(token, Claims::getSubject);
     }
     
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
+    }
+    
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
@@ -55,6 +60,15 @@ public class JwtUtil {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userDetails.getUsername());
+    }
+    
+    public String generateToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", user.getRole().name());
+        claims.put("email", user.getEmail());
+        claims.put("name", user.getName());
+        claims.put("id", user.getId());
+        return createToken(claims, user.getEmail());
     }
     
     private String createToken(Map<String, Object> claims, String subject) {

@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/offers")
 @RequiredArgsConstructor
@@ -30,8 +32,8 @@ public class HotelOfferController {
             @RequestParam(required = false) String province,
             @RequestParam(required = false) String district,
             @RequestParam(required = false) String city,
-            @RequestParam(required = false) Long bankId,
-            @RequestParam(required = false) HotelOffer.CardType cardType,
+            @RequestParam(required = false) List<Long> bankId,
+            @RequestParam(required = false) List<HotelOffer.CardType> cardType,
             Pageable pageable) {
         
         Page<HotelOfferDto> offers = hotelOfferService.getOffersWithFilters(
@@ -41,7 +43,8 @@ public class HotelOfferController {
     
     @GetMapping("/current")
     public ResponseEntity<Page<HotelOfferDto>> getCurrentValidOffers(Pageable pageable) {
-        Page<HotelOfferDto> offers = hotelOfferService.getAllOffers(pageable);
+        // Current valid offers: active and within valid date range
+        Page<HotelOfferDto> offers = hotelOfferService.getCurrentValidOffers(pageable);
         return ResponseEntity.ok(offers);
     }
     
@@ -52,7 +55,7 @@ public class HotelOfferController {
     }
     
     @PostMapping
-    public ResponseEntity<HotelOfferDto> createOffer(@Valid @RequestBody CreateHotelOfferDto createDto) {
+    public ResponseEntity<?> createOffer(@Valid @RequestBody CreateHotelOfferDto createDto) {
         HotelOfferDto offer = hotelOfferService.createOffer(createDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(offer);
     }

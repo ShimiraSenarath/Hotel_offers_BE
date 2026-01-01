@@ -1,6 +1,7 @@
 package com.hotelsoffers.dto;
 
 import com.hotelsoffers.entity.HotelOffer;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -25,11 +27,13 @@ public class UpdateHotelOfferDto {
     @NotNull(message = "Location is required")
     private LocationDto location;
     
-    @NotNull(message = "Bank is required")
-    private Long bankId;
+    @NotNull(message = "Banks are required")
+    @NotEmpty(message = "At least one bank must be selected")
+    private List<Long> bankIds;
     
-    @NotNull(message = "Card type is required")
-    private HotelOffer.CardType cardType;
+    @NotNull(message = "Card types are required")
+    @NotEmpty(message = "At least one card type must be selected")
+    private List<HotelOffer.CardType> cardTypes;
     
     @NotNull(message = "Discount is required")
     @Min(value = 1, message = "Discount must be at least 1%")
@@ -48,5 +52,6 @@ public class UpdateHotelOfferDto {
     @Size(max = 500, message = "Image URL must not exceed 500 characters")
     private String imageUrl;
     
+    @JsonProperty("isActive")
     private Boolean isActive;
 }

@@ -17,8 +17,7 @@ import java.time.LocalDateTime;
 public class User {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
-    @SequenceGenerator(name = "user_seq", sequenceName = "SEQ_USERS", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     @Column(name = "email", unique = true, nullable = false, length = 255)

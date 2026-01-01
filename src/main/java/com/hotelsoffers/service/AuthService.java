@@ -2,6 +2,7 @@ package com.hotelsoffers.service;
 
 import com.hotelsoffers.dto.LoginRequestDto;
 import com.hotelsoffers.dto.LoginResponseDto;
+import com.hotelsoffers.dto.RegisterRequestDto;
 import com.hotelsoffers.dto.UserDto;
 import com.hotelsoffers.entity.User;
 import com.hotelsoffers.mapper.UserMapper;
@@ -13,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ public class AuthService {
     private final UserMapper userMapper;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
     
     public LoginResponseDto login(LoginRequestDto loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -39,10 +42,29 @@ public class AuthService {
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         
-        String token = jwtUtil.generateToken((UserDetails) authentication.getPrincipal());
-        UserDto userDto = userMapper.toDto(user);
+        // Generate token with user role included in claims
+        String token = jwtUtil.generateToken(user);
         
-        return new LoginResponseDto(token, "Bearer", userDto);
+        return new LoginResponseDto(token, "Bearer");
+    }
+    
+    public UserDto register(RegisterRequestDto registerRequest) {
+        // Check if user already exists
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+        
+        // Create new user with default role USER
+        User user = new User();
+        user.setEmail(registerRequest.getEmail());
+        user.setName(registerRequest.getName());
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        user.setRole(User.UserRole.USER); // Default role
+        user.setIsActive(true);
+        
+        User savedUser = userRepository.save(user);
+        
+        return userMapper.toDto(savedUser);
     }
     
     @Transactional(readOnly = true)

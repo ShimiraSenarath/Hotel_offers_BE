@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/banks", "/banks/**").permitAll()
                 .requestMatchers("/offers", "/offers/**").permitAll()
-                .requestMatchers("/api/locations/**").permitAll()
+                .requestMatchers("/locations", "/locations/**").permitAll()
                 // Protected admin endpoints
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 // All other requests require authentication

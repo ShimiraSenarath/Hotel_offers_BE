@@ -13,8 +13,7 @@ import lombok.NoArgsConstructor;
 public class Country {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_countries")
-    @SequenceGenerator(name = "seq_countries", sequenceName = "SEQ_COUNTRIES", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     @Column(name = "name", nullable = false, length = 100)

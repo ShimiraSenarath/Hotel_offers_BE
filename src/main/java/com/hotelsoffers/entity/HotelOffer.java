@@ -9,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "hotel_offers")
@@ -18,14 +19,13 @@ import java.time.LocalDateTime;
 public class HotelOffer {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hotel_offer_seq")
-    @SequenceGenerator(name = "hotel_offer_seq", sequenceName = "SEQ_HOTEL_OFFERS", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     @Column(name = "hotel_name", nullable = false, length = 255)
     private String hotelName;
     
-    @Column(name = "description", columnDefinition = "CLOB")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
     
     @Column(name = "country", nullable = false, length = 100)
@@ -40,12 +40,29 @@ public class HotelOffer {
     @Column(name = "city", nullable = false, length = 100)
     private String city;
     
+    // Many-to-many relationship with banks
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "hotel_offer_banks",
+        joinColumns = @JoinColumn(name = "offer_id"),
+        inverseJoinColumns = @JoinColumn(name = "bank_id")
+    )
+    private List<Bank> banks;
+    
+    // Card types as a collection
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "hotel_offer_card_types", joinColumns = @JoinColumn(name = "offer_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "card_type", nullable = false, length = 20)
+    private List<CardType> cardTypes;
+    
+    // Keep old fields for backward compatibility (nullable)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bank_id", nullable = false)
+    @JoinColumn(name = "bank_id", nullable = true)
     private Bank bank;
     
     @Enumerated(EnumType.STRING)
-    @Column(name = "card_type", nullable = false, length = 20)
+    @Column(name = "card_type", nullable = true, length = 20)
     private CardType cardType;
     
     @Column(name = "discount", nullable = false)
@@ -57,7 +74,7 @@ public class HotelOffer {
     @Column(name = "valid_to", nullable = false)
     private LocalDate validTo;
     
-    @Column(name = "terms", columnDefinition = "CLOB")
+    @Column(name = "terms", columnDefinition = "TEXT")
     private String terms;
     
     @Column(name = "image_url", length = 500)
@@ -65,6 +82,9 @@ public class HotelOffer {
     
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
+
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
     
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

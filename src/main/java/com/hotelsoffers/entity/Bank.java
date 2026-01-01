@@ -18,8 +18,7 @@ import java.util.List;
 public class Bank {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bank_seq")
-    @SequenceGenerator(name = "bank_seq", sequenceName = "SEQ_BANKS", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     @Column(name = "name", nullable = false, length = 100)

@@ -1,5 +1,6 @@
 package com.hotelsoffers.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hotelsoffers.entity.HotelOffer;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -25,11 +27,15 @@ public class CreateHotelOfferDto {
     @NotNull(message = "Location is required")
     private LocationDto location;
     
-    @NotNull(message = "Bank is required")
-    private Long bankId;
+    @JsonProperty("bankIds")
+    @NotNull(message = "Banks are required")
+    @NotEmpty(message = "At least one bank must be selected")
+    private List<Long> bankIds;
     
-    @NotNull(message = "Card type is required")
-    private HotelOffer.CardType cardType;
+    @JsonProperty("cardTypes")
+    @NotNull(message = "Card types are required")
+    @NotEmpty(message = "At least one card type must be selected")
+    private List<HotelOffer.CardType> cardTypes;
     
     @NotNull(message = "Discount is required")
     @Min(value = 1, message = "Discount must be at least 1%")

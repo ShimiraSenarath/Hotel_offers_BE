@@ -13,8 +13,7 @@ import lombok.NoArgsConstructor;
 public class Province {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_provinces")
-    @SequenceGenerator(name = "seq_provinces", sequenceName = "SEQ_PROVINCES", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     @Column(name = "name", nullable = false, length = 100)

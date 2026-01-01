@@ -27,6 +27,7 @@ public class HotelOfferMapper {
         dto.setTerms(entity.getTerms());
         dto.setImageUrl(entity.getImageUrl());
         dto.setIsActive(entity.getIsActive());
+        dto.setIsDeleted(entity.getIsDeleted());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
         
@@ -38,9 +39,28 @@ public class HotelOfferMapper {
         location.setCity(entity.getCity());
         dto.setLocation(location);
         
-        // Map bank using BankMapper
-        if (entity.getBank() != null) {
+        // Map banks (many-to-many)
+        if (entity.getBanks() != null && !entity.getBanks().isEmpty()) {
+            dto.setBanks(entity.getBanks().stream()
+                .map(bankMapper::toDto)
+                .toList());
+            // Set first bank for backward compatibility
+            dto.setBank(bankMapper.toDto(entity.getBanks().get(0)));
+        } else if (entity.getBank() != null) {
+            // Fallback to old single bank field for backward compatibility
             dto.setBank(bankMapper.toDto(entity.getBank()));
+            dto.setBanks(java.util.List.of(bankMapper.toDto(entity.getBank())));
+        }
+        
+        // Map card types
+        if (entity.getCardTypes() != null && !entity.getCardTypes().isEmpty()) {
+            dto.setCardTypes(entity.getCardTypes());
+            // Set first card type for backward compatibility
+            dto.setCardType(entity.getCardTypes().get(0));
+        } else if (entity.getCardType() != null) {
+            // Fallback to old single card type field for backward compatibility
+            dto.setCardType(entity.getCardType());
+            dto.setCardTypes(java.util.List.of(entity.getCardType()));
         }
         
         return dto;
@@ -58,13 +78,15 @@ public class HotelOfferMapper {
         HotelOffer entity = new HotelOffer();
         entity.setHotelName(dto.getHotelName());
         entity.setDescription(dto.getDescription());
-        entity.setCardType(dto.getCardType());
+        // cardType will be set in the service for each combination
         entity.setDiscount(dto.getDiscount());
         entity.setValidFrom(dto.getValidFrom());
         entity.setValidTo(dto.getValidTo());
         entity.setTerms(dto.getTerms());
         entity.setImageUrl(dto.getImageUrl());
-        entity.setIsActive(dto.getIsActive());
+        if (dto.getIsActive() != null) {
+            entity.setIsActive(dto.getIsActive());
+        }
         
         // Map location fields
         if (dto.getLocation() != null) {
@@ -88,7 +110,7 @@ public class HotelOfferMapper {
         
         entity.setHotelName(dto.getHotelName());
         entity.setDescription(dto.getDescription());
-        entity.setCardType(dto.getCardType());
+        // cardType will be set in the service for each combination
         entity.setDiscount(dto.getDiscount());
         entity.setValidFrom(dto.getValidFrom());
         entity.setValidTo(dto.getValidTo());
