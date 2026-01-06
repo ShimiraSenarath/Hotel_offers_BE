@@ -9,7 +9,7 @@ A Spring Boot REST API for managing hotel offers with bank partnerships.
 - **Authentication**: JWT-based authentication
 - **Authorization**: Role-based access control (Admin/User)
 - **Search & Filtering**: Advanced filtering by location, bank, card type
-- **Database**: MySQL/PlanetScale integration
+- **Database**: Oracle Database integration
 - **Validation**: Comprehensive input validation
 - **Error Handling**: Global exception handling
 
@@ -19,7 +19,7 @@ A Spring Boot REST API for managing hotel offers with bank partnerships.
 - **Spring Boot 3.2.0**
 - **Spring Security** with JWT
 - **Spring Data JPA**
-- **MySQL/PlanetScale Database**
+- **Oracle Database**
 - **MapStruct** for DTO mapping
 - **Lombok** for boilerplate reduction
 - **Maven** for dependency management
@@ -28,17 +28,11 @@ A Spring Boot REST API for managing hotel offers with bank partnerships.
 
 - Java 17 or higher
 - Maven 3.6 or higher
-- MySQL/PlanetScale Database (for production) or Oracle Database (for local development)
+- Oracle Database 11g or higher
 - IDE (IntelliJ IDEA, Eclipse, VS Code)
 
 ## Database Setup
 
-The application supports both MySQL/PlanetScale (for production) and Oracle (for local development).
-
-### For Production (MySQL/PlanetScale)
-The application uses environment variables for database configuration. See the [Deployment](#deployment) section for details.
-
-### For Local Development (Oracle)
 1. **Create Database Schema**:
    ```sql
    -- Run the schema.sql file in your Oracle database
@@ -163,146 +157,12 @@ curl -X POST http://localhost:8080/api/offers \
 ## Configuration
 
 ### Environment Variables
-
-The following environment variables are required for production deployment (e.g., Render):
-
-```bash
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=your_db
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
-DB_USE_SSL=false
-JWT_SECRET=your-secret-key-at-least-256-bits-long-for-production
-```
-
-#### Environment Variable Descriptions:
-- `DB_HOST` - Your database host (e.g., `localhost` for local, or `xxxxx.psdb.cloud` for PlanetScale)
-- `DB_PORT` - Database port (default: `3306` for MySQL, `5432` for PostgreSQL, `1521` for Oracle)
-- `DB_NAME` - Your database name
 - `DB_USERNAME` - Database username
 - `DB_PASSWORD` - Database password
-- `DB_USE_SSL` - Use SSL for database connection (default: `false` for local, `true` for cloud databases like PlanetScale)
-- `JWT_SECRET` - Secret key for JWT token generation (must be at least 256 bits long for production)
-
-### How to Find Environment Variable Values
-
-#### For PlanetScale Database:
-
-1. **Log in to PlanetScale Dashboard**: https://app.planetscale.com
-
-2. **Find DB_HOST**:
-   - Go to your database
-   - Click on **"Connect"** button
-   - Select **"Connect with"** → **"General"** or **"Prisma"**
-   - Look for the connection string or host field
-   - The host will look like: `xxxxx.xxxxx.psdb.cloud`
-   - Copy this value (without `mysql://` prefix if present)
-
-3. **Find DB_NAME**:
-   - The database name is usually shown in the PlanetScale dashboard
-   - It's the name you gave your database when creating it
-   - Or check the connection string: `mysql://user:pass@host:port/DB_NAME`
-
-4. **Find DB_USERNAME and DB_PASSWORD**:
-   - In PlanetScale dashboard, go to **"Settings"** → **"Passwords"**
-   - Click **"New password"** to create a new database password
-   - The username is usually your PlanetScale account username or the database branch name
-   - Copy both values
-
-5. **Find DB_PORT**:
-   - For PlanetScale, this is always `3306` (standard MySQL port)
-
-#### For DBeaver (MySQL/PostgreSQL/Oracle):
-
-1. **Open DBeaver** and connect to your database
-
-2. **Find Connection Details**:
-   - Right-click on your database connection in the **Database Navigator** panel
-   - Select **"Edit Connection"** (or press `F4`)
-   - This opens the connection settings window
-
-3. **Find DB_HOST**:
-   - In the **"Main"** tab, look for **"Server Host"** or **"Host"** field
-   - For local databases, this is usually: `localhost` or `127.0.0.1`
-   - For remote databases, this will be the server IP or domain name
-   - Copy this value
-
-4. **Find DB_PORT**:
-   - In the same **"Main"** tab, look for **"Port"** field
-   - Common ports:
-     - MySQL: `3306`
-     - PostgreSQL: `5432`
-     - Oracle: `1521`
-   - Copy this value
-
-5. **Find DB_NAME**:
-   - In the **"Main"** tab, look for **"Database"** or **"Database/Schema"** field
-   - This is the name of your database
-   - Copy this value
-
-6. **Find DB_USERNAME**:
-   - In the **"Main"** tab, look for **"Username"** or **"User name"** field
-   - Copy this value
-
-7. **Find DB_PASSWORD**:
-   - In the **"Main"** tab, look for **"Password"** field
-   - If it shows dots/asterisks, click the **"Show password"** button (eye icon) to reveal it
-   - Copy this value
-   - **Note**: If you don't see the password, you may need to re-enter it in DBeaver
-
-8. **Alternative Method - View Connection URL**:
-   - In the connection settings, go to **"Driver properties"** or **"URL"** tab
-   - You can see the full JDBC connection string
-   - Parse it to extract: `jdbc:mysql://HOST:PORT/DB_NAME`
-   - Example: `jdbc:mysql://localhost:3306/hotelsoffers`
-     - Host: `localhost`
-     - Port: `3306`
-     - Database: `hotelsoffers`
-
-**Example Values from DBeaver:**
-```
-DB_HOST=localhost          (or your server IP)
-DB_PORT=3306               (MySQL) or 5432 (PostgreSQL) or 1521 (Oracle)
-DB_NAME=hotelsoffers       (your database name)
-DB_USERNAME=root           (or your database user)
-DB_PASSWORD=yourpassword   (your database password)
-```
-
-#### Generate JWT_SECRET:
-
-You need to generate a secure random string that's at least 256 bits (32 characters) long. Here are several ways:
-
-**Option 1: Using OpenSSL (Recommended)**
-```bash
-openssl rand -base64 32
-```
-
-**Option 2: Using Node.js**
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
-```
-
-**Option 3: Using Python**
-```bash
-python -c "import secrets; print(secrets.token_urlsafe(32))"
-```
-
-**Option 4: Online Generator**
-- Visit: https://generate-secret.vercel.app/32
-- Or: https://www.random.org/strings/
-- Generate a random string of at least 32 characters
-
-**Option 5: Manual (Not Recommended for Production)**
-You can use any random string, but make sure it's:
-- At least 32 characters long
-- Contains a mix of letters, numbers, and special characters
-- Example: `my-super-secret-jwt-key-for-production-2024!@#$`
-
-**Important**: Keep your JWT_SECRET secure and never commit it to version control!
+- `JWT_SECRET` - JWT secret key
 
 ### Application Properties
-All configuration is in `src/main/resources/application.yml`. The application will use environment variables if provided, otherwise it will fall back to default values for local development.
+All configuration is in `src/main/resources/application.yml`
 
 ## Development
 
@@ -336,35 +196,12 @@ mvn test
 
 ## Deployment
 
-### Deploying to Render
-
-1. **Connect your GitHub repository** to Render
-2. **Create a new Web Service** in Render
-3. **Configure the service**:
-   - **Build Command**: `mvn clean package -DskipTests`
-   - **Start Command**: `java -jar target/hotels-offers-backend-1.0.0.jar`
-   - **Environment**: Java 17
-
-4. **Add Environment Variables** in Render dashboard:
-   ```
-   DB_HOST=xxxxxxxx.psdb.cloud
-   DB_PORT=3306
-   DB_NAME=your_db
-   DB_USERNAME=xxxxxxxx
-   DB_PASSWORD=xxxxxxxx
-   JWT_SECRET=your-secret-key-at-least-256-bits-long-for-production
-   ```
-
-5. **Deploy** - Render will automatically build and deploy your application
-
-### Local Build & Run
-
-#### Build JAR
+### Build JAR
 ```bash
 mvn clean package
 ```
 
-#### Run JAR
+### Run JAR
 ```bash
 java -jar target/hotels-offers-backend-1.0.0.jar
 ```
@@ -377,13 +214,6 @@ EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app.jar"]
 ```
 
-### Important Notes for Production
-
-- **PlanetScale SSL**: The application is configured to use SSL connections (required by PlanetScale)
-- **Auto Schema Creation**: Tables will be automatically created on first run via Hibernate `ddl-auto: update`
-- **JWT Secret**: Use a strong, random secret key in production (at least 256 bits)
-- **Database Connection**: Ensure your database allows connections from Render's IP addresses
-
 ## Contributing
 
 1. Fork the repository
@@ -395,3 +225,10 @@ ENTRYPOINT ["java", "-jar", "/app.jar"]
 ## License
 
 This project is licensed under the MIT License.
+
+# Cloud DB Data
+# Display Name - hotelsoffers
+# DB Name - freepdb1
+# userName - ADMIN
+# password - 750750@AzIT!
+# wallet password - 750750@AzIT!

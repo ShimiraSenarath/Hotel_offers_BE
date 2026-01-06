@@ -19,13 +19,14 @@ import java.util.List;
 public class HotelOffer {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hotel_offer_seq")
+    @SequenceGenerator(name = "hotel_offer_seq", sequenceName = "SEQ_HOTEL_OFFERS", allocationSize = 1)
     private Long id;
     
     @Column(name = "hotel_name", nullable = false, length = 255)
     private String hotelName;
     
-    @Column(name = "description", columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "CLOB")
     private String description;
     
     @Column(name = "country", nullable = false, length = 100)
@@ -74,7 +75,7 @@ public class HotelOffer {
     @Column(name = "valid_to", nullable = false)
     private LocalDate validTo;
     
-    @Column(name = "terms", columnDefinition = "TEXT")
+    @Column(name = "terms", columnDefinition = "CLOB")
     private String terms;
     
     @Column(name = "image_url", length = 500)

@@ -8,10 +8,13 @@ spring:
     name: hotels-offers-backend
   
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:hotelsoffers}?useSSL=${DB_USE_SSL:false}&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: ${DB_USERNAME:hotelsoffers}
-    password: ${DB_PASSWORD:520520}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:oracle:thin:@${DB_TNS_NAME}?TNS_ADMIN=/app/wallet
+    # url: jdbc:oracle:thin:@localhost:1521/freepdb1
+    # username: hotelsoffers
+    # password: 520520
+    username: ADMIN
+    password: 750750@AzIT!
+    driver-class-name: oracle.jdbc.OracleDriver
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
@@ -25,7 +28,7 @@ spring:
     show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+        dialect: org.hibernate.dialect.OracleDialect
         format_sql: true
         jdbc:
           batch_size: 20
