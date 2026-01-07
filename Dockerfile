@@ -3,7 +3,8 @@ FROM eclipse-temurin:17-jdk-alpine
 WORKDIR /app
 
 # Copy Oracle Wallet
-COPY wallet /app/wallet
+# COPY wallet /app/wallet
+COPY Wallet_freepdb1 /app/wallet
 
 # Copy Spring Boot jar
 COPY target/*.jar app.jar
