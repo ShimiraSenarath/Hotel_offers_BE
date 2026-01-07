@@ -9,12 +9,19 @@ spring:
   
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
-    # Database connection URL - use environment variable DB_URL in production
-    # For Oracle Cloud with wallet: jdbc:oracle:thin:@TNS_NAME?TNS_ADMIN=/app/wallet
-    # TNS names available: freepdb1_high, freepdb1_medium, freepdb1_low, freepdb1_tp, freepdb1_tpurgent
-    # For direct connection: jdbc:oracle:thin:@HOST:PORT/SERVICE_NAME
-    # url: ${DB_URL:jdbc:oracle:thin:@${DB_TNS_NAME:freepdb1_high}?TNS_ADMIN=/app/wallet}
-    url: ${DB_URL:jdbc:oracle:thin:@localhost:1521/freepdb1}
+    # Database connection URL - REQUIRED in production via DB_URL environment variable
+    # Option 1: Use DB_URL for full JDBC URL (direct connection or custom)
+    # Option 2: Use DB_TNS_NAME for wallet-based connection (defaults to freepdb1_high)
+    # 
+    # For Oracle Cloud with wallet (recommended):
+    #   Set: DB_TNS_NAME=freepdb1_high (or freepdb1_medium, freepdb1_low, etc.)
+    #   Wallet files must be at /app/wallet
+    #
+    # For direct connection:
+    #   Set: DB_URL=jdbc:oracle:thin:@host:1522/service_name
+    #
+    # Local development default (only works locally):
+    url: ${DB_URL:jdbc:oracle:thin:@${DB_TNS_NAME:freepdb1_high}?TNS_ADMIN=/app/wallet}
     username: ${DB_USERNAME:ADMIN}
     password: ${DB_PASSWORD:750750@AzIT!}
     hikari:
