@@ -8,9 +8,9 @@ spring:
     name: hotels-offers-backend
   
   datasource:
-    url: jdbc:oracle:thin:@${DB_TNS_NAME}?TNS_ADMIN=/app/wallet
-    username: ADMIN
-    password: 750750@AzIT!
+    url: ${DB_URL:jdbc:oracle:thin:@${DB_TNS_NAME:freepdb1_high}?TNS_ADMIN=/app/wallet}
+    username: ${DB_USERNAME:ADMIN}
+    password: ${DB_PASSWORD:750750@AzIT!}
     driver-class-name: oracle.jdbc.OracleDriver
     hikari:
       maximum-pool-size: 20
