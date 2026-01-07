@@ -8,9 +8,6 @@ spring:
     name: hotels-offers-backend
   
   datasource:
-    # url: jdbc:oracle:thin:@localhost:1521/freepdb1
-    # username: hotelsoffers
-    # password: 520520
     url: jdbc:oracle:thin:@${DB_TNS_NAME}?TNS_ADMIN=/app/wallet
     username: ADMIN
     password: 750750@AzIT!
