@@ -49,26 +49,55 @@ JWT_SECRET=your-super-secret-jwt-key-at-least-32-characters-long-for-security
 
 ## Step 2: Oracle Wallet Setup (If Using Wallet Connection)
 
-If you're using Oracle Cloud with wallet authentication:
+If you're using Oracle Cloud with wallet authentication, you need to ensure the wallet files are available in Render.
 
-1. **Download Oracle Wallet** from Oracle Cloud Console
-2. **Upload wallet files to Render:**
-   - Create a directory in your repository: `wallet/`
-   - Add wallet files to this directory
-   - Update your build command to copy wallet files to `/app/wallet`
+### Option A: Include Wallet in Repository (Recommended)
 
-3. **Alternative: Use Build Script**
-   Add to your `render.yaml` or build script:
-   ```bash
-   # Copy wallet files during build
-   mkdir -p /app/wallet
-   cp -r wallet/* /app/wallet/
+1. **Ensure wallet files are in your repository:**
+   - Your wallet files should be in `Wallet_freepdb1/` directory
+   - Make sure this directory is committed to your Git repository
+
+2. **Update Build Command in Render:**
    ```
+   mvn clean package -DskipTests && mkdir -p /app/wallet && cp -r Wallet_freepdb1/* /app/wallet/
+   ```
+
+3. **Set Environment Variables:**
+   ```
+   DB_TNS_NAME=freepdb1_high
+   DB_USERNAME=ADMIN
+   DB_PASSWORD=your_password
+   ```
+   
+   **Note:** Available TNS names from your wallet:
+   - `freepdb1_high` (recommended for production)
+   - `freepdb1_medium`
+   - `freepdb1_low`
+   - `freepdb1_tp`
+   - `freepdb1_tpurgent`
+
+### Option B: Use Direct Connection (Simpler, No Wallet Needed)
+
+If you prefer not to use the wallet, you can use a direct connection:
+
+1. **Set Environment Variables:**
+   ```
+   DB_URL=jdbc:oracle:thin:@adb.ap-hyderabad-1.oraclecloud.com:1522/g7fc0e7633915ca_freepdb1_high.adb.oraclecloud.com
+   DB_USERNAME=ADMIN
+   DB_PASSWORD=your_password
+   ```
+   
+   **Note:** For direct connection, you may need to configure Oracle Cloud to allow connections without wallet (less secure).
 
 ## Step 3: Configure Render Service
 
 ### Build Settings
 
+**If using wallet (Option A):**
+- **Build Command:** `mvn clean package -DskipTests && mkdir -p /app/wallet && cp -r Wallet_freepdb1/* /app/wallet/`
+- **Start Command:** `java -jar target/hotels-offers-backend-1.0.0.jar`
+
+**If using direct connection (Option B):**
 - **Build Command:** `mvn clean package -DskipTests`
 - **Start Command:** `java -jar target/hotels-offers-backend-1.0.0.jar`
 
@@ -111,9 +140,21 @@ After deployment, check the logs for connection errors. The application will att
 **Cause:** TNS name cannot be resolved or wallet path is incorrect.
 
 **Solution:**
-- Verify `DB_URL` includes the correct TNS name
-- Ensure wallet files are in `/app/wallet` directory
-- Check that `TNS_ADMIN` path in URL matches actual wallet location
+- Verify `DB_TNS_NAME` is set to a valid TNS name (e.g., `freepdb1_high`)
+- Ensure wallet files are copied to `/app/wallet` during build
+- Check that wallet files exist in the repository `Wallet_freepdb1/` directory
+- Verify the build command includes the wallet copy step
+
+### Error: "Cannot resolve reference to bean 'jpaSharedEM_entityManagerFactory'"
+
+**Cause:** Database connection is failing, preventing JPA from initializing.
+
+**Solution:**
+1. Check that `DB_URL` or `DB_TNS_NAME` environment variable is set correctly
+2. Verify database credentials (`DB_USERNAME`, `DB_PASSWORD`)
+3. Ensure wallet files are present at `/app/wallet` (if using wallet)
+4. Check Render logs for database connection errors
+5. Verify Oracle Cloud allows connections from Render's IP addresses
 
 ### Error: "ORA-01017: invalid username/password"
 
@@ -137,14 +178,27 @@ After deployment, check the logs for connection errors. The application will att
 
 | Variable | Required | Description | Example |
 |----------|----------|-------------|---------|
-| `DB_URL` | Yes | Full JDBC connection URL | `jdbc:oracle:thin:@host:1521/service` |
+| `DB_URL` | Conditional | Full JDBC connection URL (if not using wallet) | `jdbc:oracle:thin:@host:1522/service` |
+| `DB_TNS_NAME` | Conditional | TNS name from wallet (if using wallet) | `freepdb1_high` |
 | `DB_USERNAME` | Yes | Database username | `ADMIN` |
 | `DB_PASSWORD` | Yes | Database password | `your_password` |
 | `JWT_SECRET` | Yes | JWT signing secret | `your-secret-key` |
 
 ## Quick Setup Checklist
 
-- [ ] Set `DB_URL` environment variable in Render
+**For Wallet Connection:**
+- [ ] Ensure `Wallet_freepdb1/` directory is in your repository
+- [ ] Set `DB_TNS_NAME` environment variable (e.g., `freepdb1_high`)
+- [ ] Set `DB_USERNAME` environment variable
+- [ ] Set `DB_PASSWORD` environment variable
+- [ ] Set `JWT_SECRET` environment variable
+- [ ] Update build command to copy wallet files
+- [ ] Configure database firewall/security to allow Render IPs
+- [ ] Deploy and check logs for connection success
+- [ ] Test API endpoints after deployment
+
+**For Direct Connection:**
+- [ ] Set `DB_URL` environment variable with full JDBC URL
 - [ ] Set `DB_USERNAME` environment variable
 - [ ] Set `DB_PASSWORD` environment variable
 - [ ] Set `JWT_SECRET` environment variable
